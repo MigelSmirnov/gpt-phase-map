@@ -11,7 +11,9 @@ from collections import defaultdict
 from pathlib import Path
 from bokeh.plotting import figure
 from bokeh.models import LinearAxis, Range1d
-
+from bokeh.models import Div
+from bokeh.models import CustomJS
+from bokeh.events import DocumentReady
 # ====== CONFIG ======
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
@@ -259,6 +261,16 @@ plane_select = Select(
     options=["ALL"] + sorted(df["dir"].astype(str).unique().tolist())
 )
 
+
+# PNG для мобильной версии
+png_div = Div(
+    text='',
+    width=700
+)
+
+# список значений энтропии
+entropy_list = Div(text="", width=600)
+
 # ====== JS CALLBACK (клик по точке) ======
 callback = CustomJS(
     args=dict(
@@ -338,6 +350,13 @@ callback = CustomJS(
     };
 
     entropy_source.change.emit();
+    
+    let s = "";
+    for(let j=0;j<entropy_source.data.angle.length;j++){
+      s += `${entropy_source.data.angle[j]} = ${entropy_source.data.entropy[j].toFixed(4)}<br>`;
+    }
+    entropy_list.text = s;
+
 
     """
 )
@@ -375,11 +394,15 @@ p2.add_tools(HoverTool(
 ))
 
 layout = bokeh_row(
-    p,
+    bokeh_column(
+        png_div,   # ← сверху PNG (мобильная версия)
+        p          # ← ниже интерактивная карта (десктоп)
+    ),
     bokeh_column(
         plane_select,
         text_div,
-        p2
+        p2,
+        entropy_list   # ← список значений энтропии
     )
 )
 
@@ -453,6 +476,13 @@ select_callback = CustomJS(
     }
 
     entropy_source.change.emit();
+    
+    let s = "";
+    for(let j=0;j<entropy_source.data.angle.length;j++){
+      s += `${entropy_source.data.angle[j]} = ${entropy_source.data.entropy[j].toFixed(4)}<br>`;
+    }
+    entropy_list.text = s;
+
 
 
     """
@@ -460,4 +490,36 @@ select_callback = CustomJS(
 
 plane_select.js_on_change("value", select_callback)
 
+
+
+mobile_js = CustomJS(args=dict(
+    p=p,
+    p2=p2,
+    png_div=png_div
+), code="""
+const is_mobile = window.innerWidth < 820;
+
+if(is_mobile){
+
+    // Спрятать интерактивную карту
+    p.visible = false;
+
+    // Показать PNG вместо неё
+    png_div.text = `
+        <img src="phase_map_static.png"
+             style="width:100%; max-width:900px; border-radius:10px;">
+    `;
+
+    // Убрать hover с графика энтропии
+    p2.tools = p2.tools.filter(t => t.type !== 'hover');
+}
+""")
+
+
+
+p.js_on_event(DocumentReady, mobile_js)
+
+
 show(layout)
+
+
