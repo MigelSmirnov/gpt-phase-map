@@ -119,7 +119,7 @@ active_view = CDSView(filter=active_filter)
 inactive_view = CDSView(filter=inactive_filter)
 
 # ====== FIGURE ======
-output_file("phase_map_fast.html")
+output_file("index.html")
 
 p = figure(
     width=700, height=700,
@@ -524,18 +524,19 @@ if(is_mobile){
 
     // Показать PNG вместо неё
     png_div.text = `
-        <img src="./phase_map_static.png">
-             style="width:100%; max-width:900px; border-radius:10px;">;
-
+        <img src="./phase_map_static.png"
+             style="width:100%; max-width:900px; border-radius:10px;">
+    `;
+        
     // Убрать hover с графика энтропии
     p2.tools = p2.tools.filter(t => t.tool_name !== "Hover");
-}
+
 """)
 
 
 curdoc().js_on_event(DocumentReady, mobile_js)
 
-
 show(layout)
+
 
 
