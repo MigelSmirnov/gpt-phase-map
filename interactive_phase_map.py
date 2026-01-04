@@ -292,7 +292,8 @@ callback = CustomJS(
     args=dict(
         source=source,
         entropy_source=entropy_source,
-        div=text_div
+        div=text_div,
+        entropy_list=entropy_list
     ),
     code="""
     const inds = source.selected.indices;
@@ -429,7 +430,8 @@ select_callback = CustomJS(
         entropy_source=entropy_source,
         div=text_div,
         active_filter=active_filter,
-        inactive_filter=inactive_filter
+        inactive_filter=inactive_filter,
+        entropy_list=entropy_list
     ),
     code="""
     const val = cb_obj.value;
@@ -522,12 +524,11 @@ if(is_mobile){
 
     // Показать PNG вместо неё
     png_div.text = `
-        <img src="phase_map_static.png"
-             style="width:100%; max-width:900px; border-radius:10px;">
-    `;
+        <img src="./phase_map_static.png">
+             style="width:100%; max-width:900px; border-radius:10px;">;
 
     // Убрать hover с графика энтропии
-    p2.tools = p2.tools.filter(t => t.type !== 'hover');
+    p2.tools = p2.tools.filter(t => t.tool_name !== "Hover");
 }
 """)
 
