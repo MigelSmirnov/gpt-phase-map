@@ -1,19 +1,35 @@
-from bokeh.plotting import figure, show, output_file
-from bokeh.models import (
-    ColumnDataSource, CDSView, BooleanFilter, HoverTool, TapTool,
-    Legend, LegendItem, Div, Select, CustomJS, LabelSet
-)
-from bokeh.layouts import column as bokeh_column, row as bokeh_row
-import pandas as pd
-import numpy as np
+# ===== Standard Library =====
 import json
 from collections import defaultdict
 from pathlib import Path
-from bokeh.plotting import figure
-from bokeh.models import LinearAxis, Range1d
-from bokeh.models import Div
-from bokeh.models import CustomJS
+
+# ===== Third-party =====
+import numpy as np
+import pandas as pd
+
+# ===== Bokeh =====
+from bokeh.plotting import figure, show, output_file
+from bokeh.io import curdoc
 from bokeh.events import DocumentReady
+
+from bokeh.models import (
+    ColumnDataSource,
+    CDSView,
+    BooleanFilter,
+    HoverTool,
+    TapTool,
+    Legend,
+    LegendItem,
+    Div,
+    Select,
+    CustomJS,
+    LabelSet,
+    LinearAxis,
+    Range1d,
+)
+
+from bokeh.layouts import column as bokeh_column, row as bokeh_row
+
 # ====== CONFIG ======
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
@@ -516,8 +532,7 @@ if(is_mobile){
 """)
 
 
-
-p.js_on_event(DocumentReady, mobile_js)
+curdoc().js_on_event(DocumentReady, mobile_js)
 
 
 show(layout)
